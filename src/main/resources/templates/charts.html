@@ -1,0 +1,274 @@
+<head>
+    <title>Dashboard</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Two+Tone" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #1b263b;
+            color: #f0f4f8;
+            padding: 0;
+        }
+
+        h1, h2 {
+            color: #03a9f4;
+        }
+
+        .chart-container {
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 2rem;
+            background: #1e2a3a;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 0 15px rgba(3, 169, 244, 0.2);
+        }
+
+        .no-data-message {
+            background: #1e2a3a;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(3, 169, 244, 0.2);
+        }
+
+        .btn {
+            background: #03a9f4;
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            margin-top: 1rem;
+            display: inline-block;
+        }
+        h1.text-center {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 1.5rem auto;
+            background: #1e2a3a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 0 15px rgba(3, 169, 244, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .chart-container:hover {
+            box-shadow: 0 0 25px rgba(3, 169, 244, 0.4);
+            transform: scale(1.01);
+        }
+
+        .no-data-message {
+            width: 100%;
+            max-width: 600px;
+            background: #1e2a3a;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(3, 169, 244, 0.2);
+        }
+
+        .btn:hover {
+            background: #0288d1;
+        }
+        footer{
+            background-color: #0d1b2a;
+            border-top: 1px solid white;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        .bi-instagram:hover,
+        .bi-twitter:hover,
+        .bi-facebook:hover{
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 191, 255, 0.4);
+        }
+        .navbar {
+            background-color: #0d1b2a;
+            margin-bottom: 10px;
+        }
+        .navbar-nav .nav-link,.navbar-brand {
+            color: white !important;
+        }
+        .navbar-nav .nav-link:hover {
+            color: #00bfff !important;
+        }
+        #logo {
+            height: 50px;
+            width: 50px;
+            margin-right: 5px;
+            border-radius: 50%;
+            border: 2px solid #00bfff;
+        }
+        #appName {
+            width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typing 3s steps(26, end) infinite;
+            text-shadow: 1px 1px 2px black, 0 0 15px #00bfff, 0 0 5px #1e90ff;
+        }
+        @keyframes typing {
+            0% { width: 0; }
+            50% { width: 26ch; }
+            100% { width: 0; }
+        }
+        .fw-bold {
+            color: white !important;
+        }
+        .fw-bold:hover {
+            color: #00bfff !important;
+        }
+        .border-bottom{
+            border-bottom: 1px white;
+        }
+    </style>
+</head>
+<body>
+<!--adding the header-->
+<div th:replace="header :: navbar"></div>
+
+<h1 class="text-center">Financial Dashboard</h1>
+
+<!-- Check for transaction data -->
+<div th:if="${#lists.isEmpty(incomeVsExpenses)}" class="d-flex justify-content-center mt-5">
+    <div class="no-data-message">
+        <h2>No transaction data</h2>
+        <p>Please add some transactions to see your financial summary.</p>
+        <a th:href="@{/transactions}" class="btn">Add Transactions</a>
+    </div>
+</div>
+
+<!-- Only show charts if there is data -->
+<div th:unless="${#lists.isEmpty(incomeVsExpenses)}" class="justify-content-center mt-4">
+    <div class="text-center mb-4">
+        <h2>Income vs Expenses</h2>
+        <div id="income_expense_chart" class="chart-container mx-auto"></div>
+    </div>
+
+    <div class="text-center mb-4">
+        <h2>Spending by Category</h2>
+        <div id="category_chart" class="chart-container mx-auto"></div>
+    </div>
+
+    <div class="text-center mb-4">
+        <h2>Balance Over Time</h2>
+        <div id="budgetChart" class="chart-container mx-auto"></div>
+    </div>
+    <div class="text-center mb-4">
+        <h2>Transactions in last 5 days</h2>
+        <div id="last5days" class="chart-container mx-auto"></div>
+    </div>
+    <div class="text-center mb-4">
+        <h2>Top 3 Categories</h2>
+        <div id="top5categories" class="chart-container mx-auto"></div>
+    </div>
+</div>
+<div th:replace="footer :: footer"></div>
+
+
+<script th:inline="javascript">
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawCharts);
+
+    function drawCharts() {
+        const incomeVsExpenses = /*[[${incomeVsExpenses}]]*/ [];
+        const categoryExpenses = /*[[${categoryExpenses}]]*/ [];
+        const income = /*[[${income}]]*/ [];
+        const last5days = /*[[${last5days}]]*/ [];
+        const top5categories = /*[[${top5categories}]]*/ [];
+        if (incomeVsExpenses.length > 0) {
+            const incomeExpenseData = google.visualization.arrayToDataTable([
+                ['Type', 'Amount'],
+                ...incomeVsExpenses
+            ]);
+
+            const incomeExpenseChart = new google.visualization.ColumnChart(document.getElementById('income_expense_chart'));
+            incomeExpenseChart.draw(incomeExpenseData, {
+                title: 'Income vs Expenses',
+                height: 400,
+                colors: ['#4CAF50', '#F44336'],
+                legend: { position: 'none' },
+                vAxis: { title: 'Amount' },
+                hAxis: { title: 'Type' }
+            });
+
+            const categoryData = google.visualization.arrayToDataTable([
+                ['Category', 'Amount'],
+                ...categoryExpenses
+            ]);
+
+            const categoryChart = new google.visualization.PieChart(document.getElementById('category_chart'));
+            categoryChart.draw(categoryData, {
+                title: 'Spending by Category',
+                height: 400,
+                pieHole: 0.4
+            });
+
+            const data = google.visualization.arrayToDataTable([
+                ['Category', 'Budget', 'Spent'],
+                ...income
+            ]);
+
+            const options = {
+                title: 'Budget vs Spent per Category',
+                bars: 'horizontal',
+                colors: ['#888', '#4caf50']
+            };
+
+            const chart = new google.visualization.BarChart(document.getElementById('budgetChart'));
+            chart.draw(data, options);
+
+            if (last5days.length > 0) {
+                const lineData = google.visualization.arrayToDataTable([
+                    ['Date', 'Transactions'],
+                    ...last5days
+                ]);
+
+                const lineOptions = {
+                    title: 'Transactions in the Last 5 Days',
+                    height: 400,
+                    curveType: 'function',
+                    legend: { position: 'bottom' },
+                    colors: ['#03a9f4'],
+                    hAxis: { title: 'Date' },
+                    vAxis: { title: 'Number of Transactions' }
+                };
+
+                const lineChart = new google.visualization.LineChart(document.getElementById('last5days'));
+                lineChart.draw(lineData, lineOptions);
+            }
+
+
+                if (top5categories.length > 0) {
+                    const topData = google.visualization.arrayToDataTable([
+                        ['Category', 'Amount'],
+                        ...top5categories
+                    ]);
+
+                    const options = {
+                        title: 'Top 3 Expense Categories',
+                        pieHole: 0.4,
+                        height: 400,
+                        legend: { position: 'right' },
+                        colors: ['#f44336', '#e91e63', '#9c27b0', '#3f51b5', '#03a9f4']
+                    };
+
+                    const chart = new google.visualization.PieChart(document.getElementById('top5categories'));
+                    chart.draw(topData, options);
+                }
+        }
+    }
+</script>
+</body>

@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Your Budget - Expense Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .budget-setup-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2rem 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 3rem 2rem;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e5e7eb;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin: 0 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .step.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .step.completed {
+            background-color: #10b981;
+            color: white;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            background-color: #f9fafb;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background-color: white;
+        }
+
+        .budget-input {
+            font-size: 2rem !important;
+            font-weight: 700;
+            text-align: center;
+            color: #059669;
+        }
+
+        .currency-symbol {
+            position: relative;
+        }
+
+        .currency-symbol::before {
+            content: '$';
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+            font-weight: 700;
+            color: #059669;
+            z-index: 1;
+        }
+
+        .currency-symbol input {
+            padding-left: 3rem;
+        }
+
+        .budget-period {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .period-option {
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background-color: #f9fafb;
+        }
+
+        .period-option:hover {
+            border-color: #667eea;
+            background-color: #f0f4ff;
+        }
+
+        .period-option.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .period-label {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .period-desc {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+
+        .category-allocation {
+            margin-top: 2rem;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            background-color: #f9fafb;
+        }
+
+        .category-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .category-icon {
+            font-size: 1.5rem;
+        }
+
+        .category-details h4 {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .category-details p {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .category-input {
+            width: 120px;
+            padding: 0.5rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .allocation-summary {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-row.total {
+            font-weight: 700;
+            font-size: 1.1rem;
+            border-top: 2px solid #0ea5e9;
+            padding-top: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            margin-top: 2rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .tips-section {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+
+        .tips-title {
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tip {
+            font-size: 0.9rem;
+            color: #92400e;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .form-container {
+                padding: 2rem 1.5rem;
+            }
+
+            .budget-period {
+                grid-template-columns: 1fr;
+            }
+
+            .category-item {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="budget-setup-card">
+        <div class="header">
+            <h1>💰 Set Your Budget</h1>
+            <p>Let's set up your budget to start tracking your expenses effectively</p>
+        </div>
+
+        <div class="form-container">
+            <div class="step-indicator">
+                <div class="step active" id="step1">1</div>
+                <div class="step" id="step2">2</div>
+                <div class="step" id="step3">3</div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 33%"></div>
+            </div>
+
+            <form id="budgetForm">
+                <!-- Step 1: Budget Amount -->
+                <div class="form-section" id="section1">
+                    <div class="section-title">
+                        <span>💵</span>
+                        What's your budget amount?
+                    </div>
+
+                    <div class="form-group">
+                        <label for="budgetAmount">Enter your budget amount</label>
+                        <div class="currency-symbol">
+                            <input type="number" id="budgetAmount" class="budget-input" step="0.01" min="0" placeholder="0.00" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Budget Period</label>
+                        <div class="budget-period">
+                            <div class="period-option" data-period="weekly">
+                                <div class="period-label">Weekly</div>
+                                <div class="period-desc">7 days</div>
+                            </div>
+                            <div class="period-option selected" data-period="monthly">
+                                <div class="period-label">Monthly</div>
+                                <div class="period-desc">30 days</div>
+                            </div>
+                            <div class="period-option" data-period="yearly">
+                                <div class="period-label">Yearly</div>
+                                <div class="period-desc">365 days</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="form-section" id="section2" style="display: none;">
+                    <div class="section-title">
+                        <span>📊</span>
+                        Allocate your budget by category
+                    </div>
+
+                    <div class="category-allocation">
+                        <form th:action="@{/budget/save-all}" method="post" id="categoryForm">
+                            <input type="hidden" name="budgetPeriod" id="budgetPeriod" th:value="${budgetPeriod ?: 'monthly'}" />
+
+                            <div th:if="${hasError}" style="color: #dc2626; margin-bottom: 1rem;">
+                                <p th:text="${error}"></p>
+                            </div>
+
+                            <div th:each="category : ${categories}" class="category-item">
+                                <div class="category-info">
+                                    <div class="category-details">
+                                        <h4 th:text="${category.name}"></h4>
+                                    </div>
+                                </div>
+                                <input type="number"
+                                       th:id="'category-' + ${category.id}"
+                                       th:name="${'amounts[' + category.id + ']'}"
+                                       class="category-input"
+                                       value="0"
+                                       min="0"
+                                       step="0.01"
+                                       data-category="${category.id}"
+                                       placeholder="0.00" />
+                            </div>
+
+                            <div class="allocation-summary">
+                                <div class="summary-row">
+                                    <span>Total Allocated:</span>
+                                    <span id="totalAllocated">$0.00</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Remaining:</span>
+                                    <span id="remaining">$0.00</span>
+                                </div>
+                                <div class="summary-row total">
+                                    <span>Budget Total:</span>
+                                    <span id="budgetTotal">$0.00</span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Step 3: Confirmation -->
+                <div class="form-section" id="section3" style="display: none;">
+                    <div class="section-title">
+                        <span>✅</span>
+                        Review and confirm your budget
+                    </div>
+
+                    <div class="allocation-summary">
+                        <h4 style="margin-bottom: 1rem; color: #1e293b;">Budget Summary</h4>
+                        <div class="summary-row">
+                            <span>Budget Period:</span>
+                            <span id="confirmPeriod">Monthly</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total Budget:</span>
+                            <span id="confirmTotal">$0.00</span>
+                        </div>
+                    </div>
+
+                    <div id="confirmCategories" style="margin-top: 1.5rem;"></div>
+
+                    <div class="tips-section">
+                        <div class="tips-title">
+                            <span>💡</span>
+                            Budget Tips
+                        </div>
+                        <div class="tip">• Follow the 50/30/20 rule: 50% needs, 30% wants, 20% savings</div>
+                        <div class="tip">• Review and adjust your budget monthly</div>
+                        <div class="tip">• Track every expense to stay on budget</div>
+                        <div class="tip">• Set aside money for emergencies</div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn" id="nextBtn" onclick="nextStep()">
+                    Next Step
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    class BudgetSetup {
+        constructor() {
+            this.currentStep = 1;
+            this.budgetData = {
+                amount: 0,
+                period: 'monthly',
+                categories: {}
+            };
+            this.init();
+        }
+
+        init() {
+            this.bindEvents();
+            this.updateProgress();
+        }
+
+        bindEvents() {
+            // Period selection
+            document.querySelectorAll('.period-option').forEach(option => {
+                option.addEventListener('click', (e) => {
+                    document.querySelectorAll('.period-option').forEach(opt => opt.classList.remove('selected'));
+                    e.currentTarget.classList.add('selected');
+                    this.budgetData.period = e.currentTarget.dataset.period;
+                });
+            });
+
+            // Budget amount input
+            document.getElementById('budgetAmount').addEventListener('input', (e) => {
+                this.budgetData.amount = parseFloat(e.target.value) || 0;
+                this.updateAllocation();
+            });
+
+            // Category inputs
+            document.querySelectorAll('.category-input').forEach(input => {
+                input.addEventListener('input', () => {
+                    this.updateAllocation();
+                });
+            });
+        }
+
+        updateAllocation() {
+            const totalBudget = this.budgetData.amount;
+            let totalAllocated = 0;
+
+            document.querySelectorAll('.category-input').forEach(input => {
+                const amount = parseFloat(input.value) || 0;
+                totalAllocated += amount;
+                this.budgetData.categories[input.dataset.category] = amount;
+            });
+
+            const remaining = totalBudget - totalAllocated;
+
+            document.getElementById('totalAllocated').textContent = `$${totalAllocated.toFixed(2)}`;
+            document.getElementById('remaining').textContent = `$${remaining.toFixed(2)}`;
+            document.getElementById('budgetTotal').textContent = `$${totalBudget.toFixed(2)}`;
+
+            // Update remaining color
+            const remainingElement = document.getElementById('remaining');
+            if (remaining < 0) {
+                remainingElement.style.color = '#dc2626';
+            } else if (remaining === 0) {
+                remainingElement.style.color = '#059669';
+            } else {
+                remainingElement.style.color = '#0ea5e9';
+            }
+        }
+
+        nextStep() {
+            if (this.currentStep === 1) {
+                if (!this.validateStep1()) return;
+                this.showStep2();
+            } else if (this.currentStep === 2) {
+                this.showStep3();
+            } else if (this.currentStep === 3) {
+                this.saveBudget();
+            }
+        }
+
+        validateStep1() {
+            const amount = parseFloat(document.getElementById('budgetAmount').value);
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid budget amount');
+                return false;
+            }
+            return true;
+        }
+
+        showStep2() {
+            this.currentStep = 2;
+            document.getElementById('section1').style.display = 'none';
+            document.getElementById('section2').style.display = 'block';
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step1').classList.add('completed');
+            document.getElementById('step2').classList.add('active');
+            document.getElementById('nextBtn').textContent = 'Review Budget';
+            document.getElementById('progressFill').style.width = '66%';
+            this.updateAllocation();
+        }
+
+        showStep3() {
+            this.currentStep = 3;
+            document.getElementById('section2').style.display = 'none';
+            document.getElementById('section3').style.display = 'block';
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step2').classList.add('completed');
+            document.getElementById('step3').classList.add('active');
+            document.getElementById('nextBtn').textContent = 'Save Budget & Continue';
+            document.getElementById('progressFill').style.width = '100%';
+            this.showConfirmation();
+        }
+
+        showConfirmation() {
+            document.getElementById('confirmPeriod').textContent = this.budgetData.period.charAt(0).toUpperCase() + this.budgetData.period.slice(1);
+            document.getElementById('confirmTotal').textContent = `$${this.budgetData.amount.toFixed(2)}`;
+
+            const categoriesHtml = Object.entries(this.budgetData.categories)
+                .filter(([_, amount]) => amount > 0)
+                .map(([category, amount]) => `
+                        <div class="summary-row">
+                            <span>${this.getCategoryName(category)}:</span>
+                            <span>$${amount.toFixed(2)}</span>
+                        </div>
+                    `).join('');
+
+            document.getElementById('confirmCategories').innerHTML = categoriesHtml;
+        }
+
+        getCategoryName(category) {
+            const names = {
+                food: 'Food & Dining',
+                transport: 'Transportation',
+                shopping: 'Shopping',
+                entertainment: 'Entertainment',
+                bills: 'Bills & Utilities',
+                health: 'Healthcare',
+                other: 'Other'
+            };
+            return names[category] || category;
+        }
+
+        // saveBudget() {
+        //     // Save to localStorage
+        //     localStorage.setItem('budget', JSON.stringify(this.budgetData));
+        //     localStorage.setItem('budgetSetupComplete', 'true');
+        //
+        //     // Show success message
+        //     alert('Budget saved successfully! Redirecting to expense tracker...');
+        //
+        //     // Redirect to main expense tracker (you can change this URL)
+        //     window.location.href = 'index.html';
+        // }
+
+        saveBudget() {
+            // 1. Креирај URLSearchParams објект за да ги форматираш податоците како form parameters
+            const formData = new URLSearchParams();
+
+            // 2. Додај го буџетскиот период
+            formData.append('budgetPeriod', this.budgetData.period.toUpperCase()); // Испраќај го како големи букви (MONTHLY, WEEKLY, YEARLY) за да одговара на BudgetPeriod enum
+
+            // 3. Додај ги износите за секоја категорија
+            for (const categoryId in this.budgetData.categories) {
+                if (Object.hasOwnProperty.call(this.budgetData.categories, categoryId)) {
+                    const amount = this.budgetData.categories[categoryId];
+                    // Клучот треба да биде во формат 'amounts[ID_НА_КАТЕГОРИЈА]'
+                    formData.append(`amounts[${categoryId}]`, amount.toFixed(2));
+                }
+            }
+
+            // 4. Испрати ги податоците до бекендот користејќи fetch API
+            fetch('/budget/save-all', { // Ова е URL-то на твојот контролер
+                method: 'POST',
+                headers: {
+                    // МНОГУ ВАЖНО: Постави го Content-Type како 'application/x-www-form-urlencoded'
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    // Ако користиш Spring Security со CSRF заштита, ќе ти треба и CSRF токен овде.
+                    // Пример: 'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+                },
+                body: formData // Испрати ги форматираните податоци
+            })
+                .then(response => {
+                    // Провери дали одговорот е успешен (на пр. 200 OK или пренасочување 302)
+                    if (response.ok || response.redirected) {
+                        console.log('Барањето за зачувување на буџетот е успешно испратено. Бегендот треба да го обработи пренасочувањето.');
+                        // Бидејќи контролерот прави redirect:/home, прелистувачот автоматски ќе го следи тоа.
+                        // Нема потреба да парсираш JSON овде.
+                    } else {
+                        // Ако има грешка и бекендот не прави пренасочување, може да испрати порака за грешка.
+                        return response.text().then(text => { // Земи го одговорот како текст за полесно дебагирање на грешки
+                            throw new Error('Серверот одговори со грешка: ' + response.status + ' - ' + text);
+                        });
+                    }
+                })
+                .then(() => {
+                    // Овој дел можеби нема да се постигне ако прелистувачот веднаш се пренасочи.
+                    // Сепак, добро е да го чуваш за дебагирање или ако нема директно пренасочување.
+                    localStorage.setItem('budgetSetupComplete', 'true');
+                    alert('Буџетот е успешно зачуван! Се пренасочувам кон почетната страница...');
+                    // Пренасочувањето треба да го прави бекендот (со `redirect:/home`).
+                    // Ако не се пренасочи, можеш да додадеш window.location.href = '/home'; овде.
+                })
+                .catch(error => {
+                    console.error('Грешка при зачувување на буџетот:', error);
+                    alert('Настана грешка при зачувување на буџетот: ' + error.message);
+                });
+        }```
+
+        updateProgress() {
+            const progress = (this.currentStep / 3) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+        }
+    }
+
+    // Initialize budget setup
+    document.addEventListener('DOMContentLoaded', () => {
+        new BudgetSetup();
+    });
+
+    // Global function for the button
+    function nextStep() {
+        window.budgetSetup = window.budgetSetup || new BudgetSetup();
+        window.budgetSetup.nextStep();
+    }
+
+
+    function submitForm() {
+        document.getElementById("categoryForm").submit();
+    }
+    function handleNextStep() {
+        submitForm();
+        nextStep();
+    }
+```</script>
+</body>
+</html>
