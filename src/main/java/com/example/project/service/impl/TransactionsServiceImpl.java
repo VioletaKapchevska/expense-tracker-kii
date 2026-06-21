@@ -70,42 +70,26 @@ public class TransactionsServiceImpl implements TransactionsService {
         return transactionRepository.findAllByUserId(id);
     }
 
-    /*@Override
-    public void save(Long userId, String category, String type, Double amount, String description, LocalDate date) {
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        Category c = categoryRepository.findByName(category).orElseThrow(CategoryNotFoundException::new);
-        Budget userBudget = budgetRepository.findByUserIdAndCategoryName(userId, category).orElseThrow(BudgetNotFoundException::new);
-        TransactionType transactionType = TransactionType.valueOf(type.toUpperCase());
-
-        Double budgetAmount = userBudget.getAmount();
-
-        if(type.equalsIgnoreCase("EXPENSE")){
-            if((budgetAmount - amount) < 0 ) throw new TransactionNotValidException(String.format("Not enough budget amount for category %s", category));
-            userBudget.setAmount(budgetAmount - amount);
-        }else{
-            userBudget.setAmount(budgetAmount + amount);
-        }
-        budgetRepository.save(userBudget);
-        Transaction t = new Transaction(amount, date, description, c, user, transactionType);
-        transactionRepository.save(t);
-    }*/
     @Override
     public void save(Long userId, String category, String type, Double amount, String description, LocalDate date) {
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
 
-        Long categoryId = Long.parseLong(category);
-        Category c = categoryRepository.findById(categoryId).orElseThrow(CategoryNotFoundException::new);
+        Category c = categoryRepository.findByName(category)
+                .orElseThrow(CategoryNotFoundException::new);
 
-        Budget userBudget = budgetRepository.findByUserIdAndCategoryName(userId, c.getName())
+        Budget userBudget = budgetRepository.findByUserIdAndCategoryName(userId, category)
                 .orElseThrow(BudgetNotFoundException::new);
 
         TransactionType transactionType = TransactionType.valueOf(type.toUpperCase());
 
         Double budgetAmount = userBudget.getAmount();
 
-        if(type.equalsIgnoreCase("EXPENSE")){
-            if((budgetAmount - amount) < 0 ) {
-                throw new TransactionNotValidException(String.format("Not enough budget amount for category %s", c.getName()));
+        if (type.equalsIgnoreCase("EXPENSE")) {
+            if ((budgetAmount - amount) < 0) {
+                throw new TransactionNotValidException(
+                        String.format("Not enough budget amount for category %s", category)
+                );
             }
             userBudget.setAmount(budgetAmount - amount);
         } else {
@@ -114,8 +98,8 @@ public class TransactionsServiceImpl implements TransactionsService {
 
         budgetRepository.save(userBudget);
 
-        Transaction t = new Transaction(amount, date, description, c, user, transactionType);
-        transactionRepository.save(t);
+        Transaction transaction = new Transaction(amount, date, description, c, user, transactionType);
+        transactionRepository.save(transaction);
     }
 
 }
