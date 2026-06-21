@@ -33,31 +33,32 @@ public class DataInitializer {
     }
 
     @PostConstruct
-    public void init()
-    {
-        roles = new ArrayList<>();
-        //   if (this.roleRepository.count() == 0) {
-        roles.add(new Role("ROLE_ADMIN"));
-        roles.add(new Role("ROLE_USER"));
-        this.roleRepository.saveAll(roles);
-        //    }
+    public void init() {
 
-        users = new ArrayList<>();
-        // if (this.userRepository.count() == 0) {
-        // String username, String password, String name, String surname, String email, String phoneNumber
-        users.add(new User("anabanana", passwordEncoder.encode("ana123"),  "Ana", "Gjurchinova", "agjurcinova@gmail.com","123123123"));
-        users.add(new User("kikaz", passwordEncoder.encode("kika123"), "Hristina", "Zdraveska", "zdeaveskah@gmail.com","234234234"));
-        this.userRepository.saveAll(users);
-        //  }
+        if (this.roleRepository.count() == 0) {
+            roles = new ArrayList<>();
+            roles.add(new Role("ROLE_ADMIN"));
+            roles.add(new Role("ROLE_USER"));
+            this.roleRepository.saveAll(roles);
+        }
 
-        categories = new ArrayList<>();
-        categories.add(new Category("Personal assets"));
-        categories.add(new Category("Household"));
-        categories.add(new Category("Savings & Investment"));
-        categories.add(new Category("Travel & Vacation"));
-        categories.add(new Category("Debt Payment"));
-        categories.add(new Category("Other"));
-        this.categoryRepository.saveAll(categories);
+        if (this.userRepository.count() == 0) {
+            users = new ArrayList<>();
+            users.add(new User("anabanana", passwordEncoder.encode("ana123"), "Ana", "Gjurchinova", "agjurcinova@gmail.com", "123123123"));
+            users.add(new User("kikaz", passwordEncoder.encode("kika123"), "Hristina", "Zdraveska", "zdeaveskah@gmail.com", "234234234"));
+            this.userRepository.saveAll(users);
+        }
+
+        if (this.categoryRepository.count() == 0) {
+            categories = new ArrayList<>();
+            categories.add(new Category("Personal assets"));
+            categories.add(new Category("Household"));
+            categories.add(new Category("Savings & Investment"));
+            categories.add(new Category("Travel & Vacation"));
+            categories.add(new Category("Debt Payment"));
+            categories.add(new Category("Other"));
+            this.categoryRepository.saveAll(categories);
+        }
     }
 }
 

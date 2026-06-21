@@ -70,7 +70,7 @@ public class TransactionsServiceImpl implements TransactionsService {
         return transactionRepository.findAllByUserId(id);
     }
 
-    @Override
+    /*@Override
     public void save(Long userId, String category, String type, Double amount, String description, LocalDate date) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Category c = categoryRepository.findByName(category).orElseThrow(CategoryNotFoundException::new);
@@ -86,6 +86,34 @@ public class TransactionsServiceImpl implements TransactionsService {
             userBudget.setAmount(budgetAmount + amount);
         }
         budgetRepository.save(userBudget);
+        Transaction t = new Transaction(amount, date, description, c, user, transactionType);
+        transactionRepository.save(t);
+    }*/
+    @Override
+    public void save(Long userId, String category, String type, Double amount, String description, LocalDate date) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+        Long categoryId = Long.parseLong(category);
+        Category c = categoryRepository.findById(categoryId).orElseThrow(CategoryNotFoundException::new);
+
+        Budget userBudget = budgetRepository.findByUserIdAndCategoryName(userId, c.getName())
+                .orElseThrow(BudgetNotFoundException::new);
+
+        TransactionType transactionType = TransactionType.valueOf(type.toUpperCase());
+
+        Double budgetAmount = userBudget.getAmount();
+
+        if(type.equalsIgnoreCase("EXPENSE")){
+            if((budgetAmount - amount) < 0 ) {
+                throw new TransactionNotValidException(String.format("Not enough budget amount for category %s", c.getName()));
+            }
+            userBudget.setAmount(budgetAmount - amount);
+        } else {
+            userBudget.setAmount(budgetAmount + amount);
+        }
+
+        budgetRepository.save(userBudget);
+
         Transaction t = new Transaction(amount, date, description, c, user, transactionType);
         transactionRepository.save(t);
     }

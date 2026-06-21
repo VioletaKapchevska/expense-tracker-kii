@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expense-tracker-app
+  namespace: expense-tracker
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: expense-tracker-app
+  template:
+    metadata:
+      labels:
+        app: expense-tracker-app
+    spec:
+      containers:
+        - name: expense-tracker-app
+          image: violetakapchevska/expense-tracker-kii:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: expense-tracker-config
+            - secretRef:
+                name: expense-tracker-secret
