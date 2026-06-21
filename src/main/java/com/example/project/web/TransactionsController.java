@@ -81,8 +81,13 @@ public class TransactionsController {
         try {
             this.transactionsService.save(user.getId(), category, type, amount, description, date);
         }catch (RuntimeException ex){
+            ex.printStackTrace();
+
             model.addAttribute("hasError", true);
             model.addAttribute("error", ex.getMessage());
+            model.addAttribute("categories", this.categoryService.findAll());
+            model.addAttribute("types", List.of(TransactionType.values()));
+
             return "add-form";
         }
         return "redirect:/transactions";
