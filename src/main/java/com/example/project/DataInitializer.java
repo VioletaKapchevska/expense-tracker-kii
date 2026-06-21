@@ -34,22 +34,37 @@ public class DataInitializer {
 
     @PostConstruct
     public void init() {
-
-        if (this.roleRepository.count() == 0) {
-            roles = new ArrayList<>();
-            roles.add(new Role("ROLE_ADMIN"));
-            roles.add(new Role("ROLE_USER"));
-            this.roleRepository.saveAll(roles);
+        if (roleRepository.findByName("ROLE_ADMIN").isEmpty()) {
+            roleRepository.save(new Role("ROLE_ADMIN"));
         }
 
-        if (this.userRepository.count() == 0) {
-            users = new ArrayList<>();
-            users.add(new User("anabanana", passwordEncoder.encode("ana123"), "Ana", "Gjurchinova", "agjurcinova@gmail.com", "123123123"));
-            users.add(new User("kikaz", passwordEncoder.encode("kika123"), "Hristina", "Zdraveska", "zdeaveskah@gmail.com", "234234234"));
-            this.userRepository.saveAll(users);
+        if (roleRepository.findByName("ROLE_USER").isEmpty()) {
+            roleRepository.save(new Role("ROLE_USER"));
         }
 
-        if (this.categoryRepository.count() == 0) {
+        if (userRepository.findByUsername("anabanana").isEmpty()) {
+            userRepository.save(new User(
+                    "anabanana",
+                    passwordEncoder.encode("ana123"),
+                    "Ana",
+                    "Gjurchinova",
+                    "agjurcinova@gmail.com",
+                    "123123123"
+            ));
+        }
+
+        if (userRepository.findByUsername("kikaz").isEmpty()) {
+            userRepository.save(new User(
+                    "kikaz",
+                    passwordEncoder.encode("kika123"),
+                    "Hristina",
+                    "Zdraveska",
+                    "zdeaveskah@gmail.com",
+                    "234234234"
+            ));
+        }
+
+        if (categoryRepository.count() == 0) {
             categories = new ArrayList<>();
             categories.add(new Category("Personal assets"));
             categories.add(new Category("Household"));
@@ -57,7 +72,7 @@ public class DataInitializer {
             categories.add(new Category("Travel & Vacation"));
             categories.add(new Category("Debt Payment"));
             categories.add(new Category("Other"));
-            this.categoryRepository.saveAll(categories);
+            categoryRepository.saveAll(categories);
         }
     }
 }
