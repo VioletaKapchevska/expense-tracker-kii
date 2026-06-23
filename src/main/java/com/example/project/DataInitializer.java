@@ -34,34 +34,11 @@ public class DataInitializer {
 
     @PostConstruct
     public void init() {
-        if (roleRepository.findByName("ROLE_ADMIN").isEmpty()) {
-            roleRepository.save(new Role("ROLE_ADMIN"));
-        }
-
-        if (roleRepository.findByName("ROLE_USER").isEmpty()) {
-            roleRepository.save(new Role("ROLE_USER"));
-        }
-
-        if (userRepository.findByUsername("anabanana").isEmpty()) {
-            userRepository.save(new User(
-                    "anabanana",
-                    passwordEncoder.encode("ana123"),
-                    "Ana",
-                    "Gjurchinova",
-                    "agjurcinova@gmail.com",
-                    "123123123"
-            ));
-        }
-
-        if (userRepository.findByUsername("kikaz").isEmpty()) {
-            userRepository.save(new User(
-                    "kikaz",
-                    passwordEncoder.encode("kika123"),
-                    "Hristina",
-                    "Zdraveska",
-                    "zdeaveskah@gmail.com",
-                    "234234234"
-            ));
+        if (roleRepository.count() == 0) {
+            roles = new ArrayList<>();
+            roles.add(new Role("ROLE_ADMIN"));
+            roles.add(new Role("ROLE_USER"));
+            roleRepository.saveAll(roles);
         }
 
         if (categoryRepository.count() == 0) {
