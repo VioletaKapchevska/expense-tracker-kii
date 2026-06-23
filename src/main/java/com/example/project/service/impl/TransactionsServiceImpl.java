@@ -78,8 +78,13 @@ public class TransactionsServiceImpl implements TransactionsService {
         Category c = categoryRepository.findByName(category)
                 .orElseThrow(CategoryNotFoundException::new);
 
-        Budget userBudget = budgetRepository.findByUserIdAndCategoryName(userId, category)
-                .orElseThrow(BudgetNotFoundException::new);
+        List<Budget> budgets = budgetRepository.findAllByUserIdAndCategoryName(userId, category);
+
+        if (budgets.isEmpty()) {
+            throw new BudgetNotFoundException();
+        }
+
+        Budget userBudget = budgets.get(0);
 
         TransactionType transactionType = TransactionType.valueOf(type.toUpperCase());
 

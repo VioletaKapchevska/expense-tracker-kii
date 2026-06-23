@@ -15,6 +15,6 @@ public interface BudgetRepository extends JpaRepository<Budget,Long>{
     Optional<Budget> findByBudgetDate(LocalDateTime budgetDate);
     Optional<Budget> findByBudgetDateBetween(LocalDateTime from, LocalDateTime to);
     Optional<Budget> findByCategoryName(String categoryName);
-    Optional<Budget> findByUserIdAndCategoryName(Long userId, String name);
+    List<Budget> findAllByUserIdAndCategoryName(Long userId, String name);
     Optional<Budget> findByUserIdAndCategoryId(Long userId, Long categoryId);
 }
